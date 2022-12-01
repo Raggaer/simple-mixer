@@ -68,7 +68,7 @@ describe("SimpleMixer test", function () {
 });
 
 // Generates an EIP-712 valid signature
-async function generateMainServerSignature(server, _contract, _to) {
+async function generateMainServerSignature(signer, _contract, _to) {
   const domain = {
     name: "SimpleMixer",
     verifyingContract: _contract
@@ -90,6 +90,6 @@ async function generateMainServerSignature(server, _contract, _to) {
     to: _to,
   };
 
-  const s = await server._signTypedData(domain, types, value);
+  const s = await signer._signTypedData(domain, types, value);
   return [value, s];
 }
