@@ -7,18 +7,18 @@ contract SimpleMixer {
   address private authPublicKey;
   address private feeRecipient;
   uint256 public feeRate = 1000;
-  mapping(uint256 => bool) private usedSalt;
+  mapping(bytes32 => bool) private usedSalt;
 
   struct WithdrawAction {
     uint256 amount;
     uint256 deadline;
-    uint256 salt;
+    bytes32 salt;
     address to;
   }
 
   // Action identifier to build the EIP712 hash
   bytes32 private WITHDRAW_ACTION_IDENTIFIER = keccak256(
-    abi.encodePacked("WithdrawAction(uint256 amount,uint256 deadline,uint256 salt,address to)")
+    abi.encodePacked("WithdrawAction(uint256 amount,uint256 deadline,bytes32 salt,address to)")
   );
 
   // Domain identifier for the EIP712 hash

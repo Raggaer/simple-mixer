@@ -128,7 +128,7 @@ async function generateMainServerSignature(signer, _contract, _to, _value) {
     WithdrawAction: [
       { name: "amount", type: "uint256" },
       { name: "deadline", type: "uint256" },
-      { name: "salt", type: "uint256" },
+      { name: "salt", type: "bytes32" },
       { name: "to", type: "address" },
     ]
   };
@@ -136,7 +136,7 @@ async function generateMainServerSignature(signer, _contract, _to, _value) {
   const value = {
     amount: ethers.utils.parseEther(_value),
     deadline: 2670810385,
-    salt: 420,
+    salt: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("randon_salt_test")),
     to: _to,
   };
 
