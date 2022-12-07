@@ -89,6 +89,33 @@ describe("SimpleMixer test", function () {
     await expect(mixer.connect(addr2).withdraw(v, s)).to.be.revertedWith("Invalid provided signature");
   });
 
+  it("Use a different spoofed salt value", async function () {
+    const [owner, addr1, addr2, addr3, addr4] = await ethers.getSigners();
+
+    const mixerFactory = await ethers.getContractFactory("SimpleMixer");
+    const mixer = await mixerFactory.deploy(owner.address, 1000);
+    await mixer.deployed();
+
+    // User 1 deposits some coins
+    // For this test we deposit 15 ETH but the user should withdraw 5
+    await mixer.connect(addr1).deposit({
+      value: ethers.utils.parseEther("15.0")
+    });
+
+    expect(await mixer.getBalance()).to.equal(ethers.utils.parseEther("15.0"));
+
+    // User now has a signature from the main server
+    // addr2 sends the transaction and addr3 should get the mixer coins
+    const startingBalance3 = await ethers.provider.getBalance(addr3.address);
+    const startingBalanceFee = await ethers.provider.getBalance(owner.address);
+
+    const [v, s] = await generateMainServerSignature(owner, mixer.address, addr3.address, "5.0");
+
+    // User sends on the value 10 instead of the signed 5
+    v.salt = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("spoofed_salt_test"));
+    await expect(mixer.connect(addr2).withdraw(v, s)).to.be.revertedWith("Invalid provided signature");
+  });
+
   it("Use a different amount at withdraw", async function () {
     const [owner, addr1, addr2, addr3, addr4] = await ethers.getSigners();
 
