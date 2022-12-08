@@ -163,7 +163,7 @@ async function generateMainServerSignature(signer, _contract, _to, _value) {
   const value = {
     amount: ethers.utils.parseEther(_value),
     deadline: 2670810385,
-    salt: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("randon_salt_test")),
+    salt: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("random_salt_test")),
     to: _to,
   };
 
