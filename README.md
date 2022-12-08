@@ -10,3 +10,4 @@ This method will check if the signature was signed by the central address and se
 ## Repository structure
 
 - hardhat: Directory containing all Solidity related files. Tests, deployment and smart-contracts.
+- web: Contains the mixer frontend and backend in Go.
