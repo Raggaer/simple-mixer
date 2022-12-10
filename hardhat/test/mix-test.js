@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-const { ethers } = require("hardhat");
+const { ethers, config } = require("hardhat");
 
 describe("SimpleMixer test", function () {
   it("Mix some coins properly", async function () {
@@ -154,7 +154,6 @@ async function generateMainServerSignature(signer, _contract, _to, _value) {
   const types = {
     WithdrawAction: [
       { name: "amount", type: "uint256" },
-      { name: "deadline", type: "uint256" },
       { name: "salt", type: "bytes32" },
       { name: "to", type: "address" },
     ]
@@ -162,7 +161,6 @@ async function generateMainServerSignature(signer, _contract, _to, _value) {
 
   const value = {
     amount: ethers.utils.parseEther(_value),
-    deadline: 2670810385,
     salt: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("random_salt_test")),
     to: _to,
   };

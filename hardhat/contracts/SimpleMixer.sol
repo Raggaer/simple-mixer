@@ -11,20 +11,19 @@ contract SimpleMixer {
 
   struct WithdrawAction {
     uint256 amount;
-    uint256 deadline;
     bytes32 salt;
     address to;
   }
 
   // Action identifier to build the EIP712 hash
   bytes32 private WITHDRAW_ACTION_IDENTIFIER = keccak256(
-    abi.encodePacked("WithdrawAction(uint256 amount,uint256 deadline,bytes32 salt,address to)")
+    abi.encodePacked("WithdrawAction(uint256 amount,bytes32 salt,address to)")
   );
 
   // Domain identifier for the EIP712 hash
   bytes32 private DOMAIN_IDENTIFIER = keccak256(
     abi.encodePacked(
-      keccak256(abi.encodePacked("EIP712Domain(string name,address verifyingContract)")),
+      keccak256(bytes("EIP712Domain(string name,address verifyingContract)")),
       keccak256(bytes("SimpleMixer")),
       uint256(uint160(address(this)))
     )
@@ -48,7 +47,6 @@ contract SimpleMixer {
 
   function withdraw(WithdrawAction memory _action, bytes memory _signature) public {
     require(!usedSalt[_action.salt], "Salt already used");
-    require(_action.deadline > block.timestamp, "Withdraw deadline expired");
     require(address(this).balance >= _action.amount, "Contract does not have enough balance");
 
     usedSalt[_action.salt] = true;
@@ -75,7 +73,6 @@ contract SimpleMixer {
       abi.encodePacked(
         WITHDRAW_ACTION_IDENTIFIER,
         _action.amount,
-        _action.deadline,
         _action.salt,
         uint256(uint160(_action.to))
       )
