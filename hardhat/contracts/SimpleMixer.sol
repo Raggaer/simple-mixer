@@ -1,26 +1,29 @@
-//SPDX-License-Identifier: Unlicense
+// SPDX-License-Identifier: MIT 
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
 
+/// @title A simple mixer using ECDSA signatures
+/// @author Álvaro Carvajal Castro
 contract SimpleMixer {
   address private authPublicKey;
   address private feeRecipient;
   uint256 public feeRate = 1000;
   mapping(bytes32 => bool) private usedSalt;
 
+  // Struct used for signature computation
   struct WithdrawAction {
     uint256 amount;
     bytes32 salt;
     address to;
   }
 
-  // Action identifier to build the EIP712 hash
+  // Calculate the WithdrawAction struct hash
   bytes32 private WITHDRAW_ACTION_IDENTIFIER = keccak256(
     abi.encodePacked("WithdrawAction(uint256 amount,bytes32 salt,address to)")
   );
 
-  // Domain identifier for the EIP712 hash
+  // Calculate the EIP712 domain struct hash
   bytes32 private DOMAIN_IDENTIFIER = keccak256(
     abi.encodePacked(
       keccak256(bytes("EIP712Domain(string name,address verifyingContract)")),
@@ -29,6 +32,9 @@ contract SimpleMixer {
     )
   );
 
+  /// SimpleMixer constructor
+  /// @param _r Address where the fees will go to
+  /// @param _rate Fee rate to apply to all withdraw operations
   constructor(address _r, uint256 _rate) {
     require(_rate > 0 && _rate < 10000, "Invalid fee rate");
 
@@ -37,14 +43,19 @@ contract SimpleMixer {
     feeRate = _rate;
   }
 
+  /// Allows users to deposit Ether into the contract
   function deposit() public payable {
     require(msg.value >= 1 ether);
   }
 
+  /// Retrieves current contract balance
   function getBalance() public view returns (uint256) {
     return address(this).balance;
   }
 
+  /// Withdraws the given amount of Ether
+  /// @param _action The WithdrawAction struct to use for checking the signature
+  /// @param _signature The ECDSA server generated signature
   function withdraw(WithdrawAction memory _action, bytes memory _signature) public {
     require(!usedSalt[_action.salt], "Salt already used");
     require(address(this).balance >= _action.amount, "Contract does not have enough balance");
@@ -67,6 +78,9 @@ contract SimpleMixer {
     require(success, "Unable to send fee value");
   }
 
+  /// Builds a typed data hash of the given WithdrawAction struct and EIP712 domain
+  /// @param _action The WithdrawAction struct to use for building the final hash
+  /// @return The final Identifier + EIP712 domain struct + WithdrawAction struct hash
   function getWithdrawTypedDataHash(WithdrawAction memory _action) private view returns (bytes32) {
     // Hash struct
     bytes32 structHash = keccak256(
@@ -87,6 +101,10 @@ contract SimpleMixer {
     );
   }
 
+  /// Recovers a public key from the given ECDSA signature
+  /// @param _hash Value hash used on the signature
+  /// @param _signature ECDSA signature
+  /// @return The signature public key
   function recover(bytes32 _hash, bytes memory _signature) internal pure returns (address) {
     require(_signature.length == 65, "Invalid signature length");
 

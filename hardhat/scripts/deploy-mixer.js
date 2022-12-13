@@ -2,7 +2,7 @@ const hre = require("hardhat");
 const mixerFee = 1000;
 
 async function main() {
-  const [owner, addr1, addr2, addr3] = await ethers.getSigners();
+  const [owner] = await ethers.getSigners();
 
   const mixerFactory = await hre.ethers.getContractFactory("SimpleMixer");
   const mixer = await mixerFactory.deploy(owner.address, 1000);
