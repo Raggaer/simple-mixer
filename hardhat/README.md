@@ -6,14 +6,6 @@ Any user is able to call the contract `deposit` method, retrieve a signature fro
 - `deposit` Just a simple payable function.
 - `withdraw` Generates a typed data hash and alongside the provided ECDSA signature checks if the public key matches.
 
-## Testing
-
-The following command will execute all the repository tests:
-
-```shell
-npx hardhat test
-```
-
 ## Deployment
 
 The contract constructor expects two arguments:
@@ -22,3 +14,11 @@ The contract constructor expects two arguments:
 - Fee precentage to charge from every withdraw.
 
 On the `scripts/deploy-mixer.js` there is a deployment example.
+
+## Testing
+
+The following command will execute all the repository tests:
+
+```shell
+npx hardhat test
+```
