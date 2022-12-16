@@ -1,65 +1,20 @@
 <html>
   <head>
     <title>SimpleMixer</title>
-    <style>
-body {
-  padding: 0px;
-  background-color: #28600b26;
-}
-
-.container {
-  margin: 0 auto;
-  margin-top: 40px;
-  max-width: 800px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-
-.actions {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 25px;
-}
-
-.action {
-  display: flex;
-  border: 3px dotted green;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 350px;
-  height: 150px;
-  padding: 20px;
-}
-
-.form-control {
-  text-align: center;
-}
-
-button {
-  padding: 5px 20px 5px 20px;
-  background-color: #008000c9;
-  color: white;
-  border-radius: 3px;
-  font-size: 14px;
-  border: 1px solid #00000094;
-  cursor: pointer;
-}
-
-.form-control input {
-  padding: 10px;
-  display: block;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-    </style>
+    <link rel="stylesheet" href="/static/css/style.css" />
   </head>
   <body>
     <div class="container">
-      <h1>SimpleMixer</h1>
+      <h1 class="title">SimpleMixer</h1>
+
+      <div class="howto">
+        <ol>
+          <li>Click on "Deposit Funds" and complete the transaction.</li>
+          <li>You will be asked to send a signed message to the server.</li>
+          <li>The server will then send you a signed message.</li>
+          <li>You can now use that signed message to withdraw your funds.</li>
+        </ol>
+      </div>
 
       <div class="actions">
         <div class="action">
@@ -67,8 +22,8 @@ button {
         </div>
         <div class="action">
           <div class="form-control">
-            <label for="signature">Signed Message</label>
-            <input type="text" id="signature" placeholder="Signed message..." />
+            <label for="signature">Server Signature</label>
+            <input type="text" id="signature" placeholder="Server signature..." />
           </div>
           <button id="withdraw">Withdraw Funds</button>
         </div>

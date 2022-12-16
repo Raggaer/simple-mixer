@@ -5,10 +5,18 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 )
 
-type httpHandlerFunc func(*template.Template, http.ResponseWriter, *http.Request) error
+type httpHandlerFunc func(*controllerContext) error
+
+type controllerContext struct {
+	abi string
+	res http.ResponseWriter
+	req *http.Request
+	tpl *template.Template
+}
 
 func main() {
 	// Load templates
@@ -18,7 +26,16 @@ func main() {
 		return
 	}
 
-	http.HandleFunc("/", errorHandler(tpl, showHomepage))
+	// Load contract ABI
+	abi, err := loadContractABI(filepath.Join("abi", "SimpleMixer.json"))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to load contract ABI JSON file: %v\n", err)
+		return
+	}
+
+	http.HandleFunc("/", errorHandler(abi, tpl, showHomepage))
+	fs := http.FileServer(http.Dir("./static"))
+	http.HandleFunc("/static/", staticHandler(http.StripPrefix("/static", fs)))
 
 	// Create custom server with settings
 	httpServer := &http.Server{
@@ -38,12 +55,35 @@ func main() {
 	}
 }
 
-func errorHandler(tpl *template.Template, f httpHandlerFunc) http.HandlerFunc {
+func staticHandler(fs http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		if err := f(tpl, w, req); err != nil {
+		fs.ServeHTTP(w, req)
+	}
+}
+
+// Handle any controller action by returning an error
+func errorHandler(abi string, tpl *template.Template, f httpHandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		ctx := &controllerContext{
+			abi: abi,
+			tpl: tpl,
+			req: req,
+			res: w,
+		}
+
+		if err := f(ctx); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
 		}
 	}
+}
+
+// Load ABI on startup so we dont need to load the file on every request
+func loadContractABI(p string) (string, error) {
+	content, err := os.ReadFile(p)
+	if err != nil {
+		return "", err
+	}
+	return string(content), nil
 }
