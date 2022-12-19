@@ -7,6 +7,15 @@ body {
   background-size: cover;
 }
 
+.alert.alert-error {
+  border: 1px solid #00000061;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 3px;
+  background-color: #e5a9a9;
+  box-shadow: 4px 3px 2px #00000024;
+}
+
 .howto {
   padding: 10px;
   border-radius: 4px;
@@ -65,6 +74,10 @@ body {
 
 .form-control {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 button {

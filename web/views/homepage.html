@@ -7,6 +7,11 @@
     <div class="container">
       <h1 class="title">SimpleMixer</h1>
 
+      <!-- Alert message -->
+      <div id="err" class="alert alert-error" style="display: none;">
+      </div>
+
+      <!-- Usage instructions -->
       <div class="howto">
         <ol>
           <li>Click on "Deposit Funds" and complete the transaction.</li>
@@ -16,10 +21,19 @@
         </ol>
       </div>
 
+      <!-- Action buttons -->
       <div class="actions">
+
+        <!-- Deposit -->
         <div class="action">
+          <div class="form-control">
+            <label for="signature">Ether amount to deposit</label>
+            <input type="text" id="amount" placeholder="Ether amount to deposit..." />
+          </div>
           <button id="deposit">Deposit Funds</button>
         </div>
+
+        <!-- Withdraw -->
         <div class="action">
           <div class="form-control">
             <label for="signature">Server Signature</label>
@@ -30,4 +44,13 @@
       </div>
     </div>
   </body>
+
+  <script>
+    var rpcURL = "{{ .Rpc }}";
+    var mixerContractAddress = "{{ .Addr }}";
+    var mixerContractABI = "{{ .Abi }}";
+  </script>
+
+  <script src="/static/js/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
+  <script type="module" src="/static/js/app.js" type="application/javascript"></script>
 </html>

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"html/template"
 	"net/http"
 	"os"
@@ -12,10 +13,11 @@ import (
 type httpHandlerFunc func(*controllerContext) error
 
 type controllerContext struct {
-	abi string
-	res http.ResponseWriter
-	req *http.Request
-	tpl *template.Template
+	abi    string
+	res    http.ResponseWriter
+	req    *http.Request
+	tpl    *template.Template
+	client *ethclient.Client
 }
 
 func main() {
@@ -33,7 +35,15 @@ func main() {
 		return
 	}
 
-	http.HandleFunc("/", errorHandler(abi, tpl, showHomepage))
+	// Connect to RPC server
+	client, err := createEthClient("http://localhost:8545")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to connect to RPC server: %v\n", err)
+		return
+	}
+
+	http.HandleFunc("/", errorHandler(client, abi, tpl, showHomepage))
+	http.HandleFunc("/api/sign", errorHandler(client, abi, tpl, sendSignature))
 	fs := http.FileServer(http.Dir("./static"))
 	http.HandleFunc("/static/", staticHandler(http.StripPrefix("/static", fs)))
 
@@ -62,13 +72,14 @@ func staticHandler(fs http.Handler) http.HandlerFunc {
 }
 
 // Handle any controller action by returning an error
-func errorHandler(abi string, tpl *template.Template, f httpHandlerFunc) http.HandlerFunc {
+func errorHandler(client *ethclient.Client, abi string, tpl *template.Template, f httpHandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		ctx := &controllerContext{
-			abi: abi,
-			tpl: tpl,
-			req: req,
-			res: w,
+			abi:    abi,
+			client: client,
+			tpl:    tpl,
+			req:    req,
+			res:    w,
 		}
 
 		if err := f(ctx); err != nil {
@@ -77,6 +88,12 @@ func errorHandler(abi string, tpl *template.Template, f httpHandlerFunc) http.Ha
 			return
 		}
 	}
+}
+
+// Connects to the given RPC server
+func createEthClient(rpc string) (*ethclient.Client, error) {
+	client, err := ethclient.Dial(rpc)
+	return client, err
 }
 
 // Load ABI on startup so we dont need to load the file on every request
