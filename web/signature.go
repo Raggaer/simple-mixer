@@ -2,14 +2,24 @@ package main
 
 import (
 	"context"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"strconv"
+	"strings"
 )
+
+type sendSignatureResponse struct {
+	Success   bool   `json:"success"`
+	Signature string `json:"signature"`
+	Amount    string `json:"amount"`
+}
 
 func sendSignature(ctx *controllerContext) error {
 	msg := ctx.req.FormValue("msg")
@@ -28,14 +38,52 @@ func sendSignature(ctx *controllerContext) error {
 	}
 
 	// Check if the transaction is correct
-	checkTransaction(ctx.client, tx)
+	valid, amount, err := checkTransaction(ctx.client, signer, tx)
+	if err != nil {
+		return fmt.Errorf("Unable to checkTransaction: %v", err)
+	}
+	if !valid {
+		return nil
+	}
+
+	// Generate EIP-712 signature for the client
+	signature, _, err := signWithdraw("0xc688Fc485cf1A76ca5c4a3b08FCb101f776Ff567", "0x087F95CccF11F7761Bbd66097e72f730F618Ada2", nil, ctx.priv)
+	if err != nil {
+		return fmt.Errorf("Unable to signWithdraw: %v", err)
+	}
+
+	response, err := json.Marshal(sendSignatureResponse{
+		Success:   true,
+		Signature: hex.EncodeToString(signature),
+		Amount:    amount,
+	})
+	if err != nil {
+		return fmt.Errorf("Unable to Marshal JSON response: %v", err)
+	}
+
+	ctx.res.Header().Add("Content-Type", "application/json")
+	ctx.res.Write(response)
 	return nil
 }
 
-func checkTransaction(client *ethclient.Client, txHash string) {
+func checkTransaction(client *ethclient.Client, expectedSigner, txHash string) (bool, string, error) {
 	tx, pending, err := client.TransactionByHash(context.Background(), common.HexToHash(txHash))
-	fmt.Println(tx, pending, err)
-	fmt.Println(tx.Value())
+	if err != nil {
+		return false, "", err
+	}
+	if pending {
+		return false, "", nil
+	}
+
+	// Retrieve signer
+	signer, err := types.LatestSignerForChainID(tx.ChainId()).Sender(tx)
+	if err != nil {
+		return false, "", fmt.Errorf("Unable to retrieve transaction latest signer: %v", err)
+	}
+	if strings.ToLower(signer.Hex()) != strings.ToLower(expectedSigner) {
+		return false, "", nil
+	}
+	return true, tx.Value().String(), nil
 }
 
 func verifySignature(signedMessage, message string) (string, error) {

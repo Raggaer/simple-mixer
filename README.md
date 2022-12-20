@@ -34,3 +34,4 @@ The main limitation is that its a centralized model,
 the main server is able to view the relation between deposit and withdraw calls.
 
 Due to front-running issues the user A must provide a destination address to the server.
+If not, users could check the Mempool and get the signature, using it with a different `to` address.

@@ -2,6 +2,41 @@
 const rpcProvider = new ethers.providers.JsonRpcProvider(rpcURL);
 const contract_RO = new ethers.Contract(mixerContractAddress, mixerContractABI, rpcProvider);
 
+document.getElementById("withdraw").addEventListener("click", async function() {
+  hideAlert();
+
+  let provider;
+  let signer;
+  try {
+    [provider, signer] = await getProviderAndSigner();
+  } catch(e) {
+    showAlert("Unable to retrieve Web3 signer. Please try again.");
+    return;
+  }
+
+  // Withdraw funds
+  await withdrawFunds(signer);
+});
+
+async function withdrawFunds(signature, salt, signer) {
+  const addr = await signer.getAddress();
+
+  // Call withdraw method
+  try {
+    const contract_WO = new ethers.Contract(mixerContractAddress, mixerContractABI, signer);
+    const receipt = await contract_WO.withdraw({
+      amount: ethers.utils.parseEther("7"),
+      salt: salt,
+      to: addr,
+    }, signature);
+
+    await receipt.wait();
+  } catch(e) {
+    showAlert("Unable to call withdraw. Please try again.");
+    return;
+  }
+}
+
 document.getElementById("deposit").addEventListener("click", async function() {
   hideAlert();
 
@@ -16,6 +51,9 @@ document.getElementById("deposit").addEventListener("click", async function() {
 
   // Deposit funds and get txid
   const txid = await depositFunds(signer);
+  if(txid == null) {
+    return;
+  }
 
   // Sign message and send to the server
   const signature = await getServerSignedMessage(txid, signer);

@@ -15,6 +15,7 @@ type httpHandlerFunc func(*controllerContext) error
 type controllerContext struct {
 	abi    string
 	res    http.ResponseWriter
+	priv   *privateKey
 	req    *http.Request
 	tpl    *template.Template
 	client *ethclient.Client
@@ -25,6 +26,13 @@ func main() {
 	tpl, err := template.New("SimpleMixer").ParseGlob("views/*")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to load templates: %v\n", err)
+		return
+	}
+
+	// Load private key
+	privKey, err := parsePrivateKey("")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to parse private key: %v\n", err)
 		return
 	}
 
@@ -42,8 +50,8 @@ func main() {
 		return
 	}
 
-	http.HandleFunc("/", errorHandler(client, abi, tpl, showHomepage))
-	http.HandleFunc("/api/sign", errorHandler(client, abi, tpl, sendSignature))
+	http.HandleFunc("/", errorHandler(client, privKey, abi, tpl, showHomepage))
+	http.HandleFunc("/api/sign", errorHandler(client, privKey, abi, tpl, sendSignature))
 	fs := http.FileServer(http.Dir("./static"))
 	http.HandleFunc("/static/", staticHandler(http.StripPrefix("/static", fs)))
 
@@ -72,10 +80,11 @@ func staticHandler(fs http.Handler) http.HandlerFunc {
 }
 
 // Handle any controller action by returning an error
-func errorHandler(client *ethclient.Client, abi string, tpl *template.Template, f httpHandlerFunc) http.HandlerFunc {
+func errorHandler(client *ethclient.Client, privKey *privateKey, abi string, tpl *template.Template, f httpHandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		ctx := &controllerContext{
 			abi:    abi,
+			priv:   privKey,
 			client: client,
 			tpl:    tpl,
 			req:    req,
