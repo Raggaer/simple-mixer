@@ -34,7 +34,7 @@ after that a signature should be provided to the user, he is then able to call `
 - User A calls `deposit` with any amount of Ether.
 - User A generates proof by sending a signed message to the server and some data (destination address for example).
 - The server generates an EIP-712 signature and sends it back to the user.
-- User A can now call `withdraw` from the provided destination address.
+- User A can now call `withdraw`  and the funds will go to the provided destination address.
 
 ## Limitations
 
