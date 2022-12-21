@@ -9,8 +9,8 @@ import (
 )
 
 // Generate a valid EIP712 signed message
-func signWithdraw(to, contract string, salt []byte, priv *privateKey) ([]byte, []byte, error) {
-	typedData, salt, err := hashTypedData(salt, to, contract)
+func signWithdraw(to, contract, amount string, salt []byte, priv *privateKey) ([]byte, []byte, error) {
+	typedData, salt, err := hashTypedData(salt, amount, to, contract)
 	if err != nil {
 		return nil, nil, fmt.Errorf("Unable to hashTypedData: %v", err)
 	}
@@ -27,7 +27,7 @@ func signWithdraw(to, contract string, salt []byte, priv *privateKey) ([]byte, [
 	return signature, salt, err
 }
 
-func hashTypedData(salt []byte, to, contract string) ([]byte, []byte, error) {
+func hashTypedData(salt []byte, amount, to, contract string) ([]byte, []byte, error) {
 	// Generate salt
 	if salt == nil {
 		s, err := secureRandomString(64)
@@ -65,7 +65,7 @@ func hashTypedData(salt []byte, to, contract string) ([]byte, []byte, error) {
 			VerifyingContract: contract,
 		},
 		Message: apitypes.TypedDataMessage{
-			"amount": "5000000000000000000",
+			"amount": amount,
 			"salt":   salt,
 			"to":     to,
 		},

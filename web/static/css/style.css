@@ -7,13 +7,23 @@ body {
   background-size: cover;
 }
 
-.alert.alert-error {
-  border: 1px solid #00000061;
+.alert {
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 3px;
-  background-color: #e5a9a9;
   box-shadow: 4px 3px 2px #00000024;
+  max-width: 500px;
+  overflow-wrap: break-word;
+}
+
+.alert.alert-success {
+  border: 1px solid #00000061;
+  background-color: #a9dfe5;
+}
+
+.alert.alert-error {
+  border: 1px solid #00000061;
+  background-color: #e5a9a9;
 }
 
 .howto {
@@ -68,16 +78,18 @@ body {
   align-items: center;
   justify-content: center;
   min-width: 350px;
-  height: 150px;
+  height: 200px;
   padding: 20px;
 }
 
 .form-control {
   text-align: center;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 300px;
 }
 
 button {

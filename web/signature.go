@@ -18,11 +18,13 @@ import (
 type sendSignatureResponse struct {
 	Success   bool   `json:"success"`
 	Signature string `json:"signature"`
+	Salt      string `json:"salt"`
 	Amount    string `json:"amount"`
 }
 
 func sendSignature(ctx *controllerContext) error {
 	msg := ctx.req.FormValue("msg")
+	dest := ctx.req.FormValue("dest")
 	signer := ctx.req.FormValue("signer")
 	tx := ctx.req.FormValue("tx")
 
@@ -47,14 +49,16 @@ func sendSignature(ctx *controllerContext) error {
 	}
 
 	// Generate EIP-712 signature for the client
-	signature, _, err := signWithdraw("0xc688Fc485cf1A76ca5c4a3b08FCb101f776Ff567", "0x087F95CccF11F7761Bbd66097e72f730F618Ada2", nil, ctx.priv)
+	signature, salt, err := signWithdraw(dest, "0x213C4dFfFD764765d11FbC067b9Ef89853CCb4a3", amount, nil, ctx.priv)
 	if err != nil {
 		return fmt.Errorf("Unable to signWithdraw: %v", err)
 	}
 
+	// Return data as json
 	response, err := json.Marshal(sendSignatureResponse{
 		Success:   true,
 		Signature: hex.EncodeToString(signature),
+		Salt:      hex.EncodeToString(salt),
 		Amount:    amount,
 	})
 	if err != nil {

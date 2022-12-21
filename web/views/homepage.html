@@ -10,6 +10,8 @@
       <!-- Alert message -->
       <div id="err" class="alert alert-error" style="display: none;">
       </div>
+      <div id="success" class="alert alert-success" style="display: none;">
+      </div>
 
       <!-- Usage instructions -->
       <div class="howto">
@@ -27,19 +29,25 @@
         <!-- Deposit -->
         <div class="action">
           <div class="form-control">
-            <label for="signature">Ether amount to deposit</label>
+            <label for="amount">Amount</label>
             <input type="text" id="amount" placeholder="Ether amount to deposit..." />
           </div>
-          <button id="deposit">Deposit Funds</button>
+
+          <div class="form-control">
+            <label for="dest" style="font-size: 12px;">Destination</label>
+            <input type="text" id="dest" placeholder="Destination address..." />
+          </div>
+
+          <button id="deposit" style="margin-top: auto;">Deposit Funds</button>
         </div>
 
         <!-- Withdraw -->
         <div class="action">
           <div class="form-control">
-            <label for="signature">Server Signature</label>
+            <label for="signature" style="font-size: 14px;">Signature</label>
             <input type="text" id="signature" placeholder="Server signature..." />
           </div>
-          <button id="withdraw">Withdraw Funds</button>
+          <button id="withdraw" style="margin-top: auto;">Withdraw Funds</button>
         </div>
       </div>
     </div>

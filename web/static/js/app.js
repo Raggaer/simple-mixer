@@ -4,6 +4,7 @@ const contract_RO = new ethers.Contract(mixerContractAddress, mixerContractABI, 
 
 document.getElementById("withdraw").addEventListener("click", async function() {
   hideAlert();
+  hideSuccess();
 
   let provider;
   let signer;
@@ -18,27 +19,31 @@ document.getElementById("withdraw").addEventListener("click", async function() {
   await withdrawFunds(signer);
 });
 
-async function withdrawFunds(signature, salt, signer) {
+async function withdrawFunds(signer) {
   const addr = await signer.getAddress();
+  const signature = document.getElementById("signature").value;
+  const data = atob(signature).split("##");
 
   // Call withdraw method
   try {
     const contract_WO = new ethers.Contract(mixerContractAddress, mixerContractABI, signer);
     const receipt = await contract_WO.withdraw({
-      amount: ethers.utils.parseEther("7"),
-      salt: salt,
-      to: addr,
-    }, signature);
-
+      amount: ethers.utils.parseEther(data[0]),
+      salt: ethers.utils.arrayify(data[2]),
+      to: data[1],
+    }, ethers.utils.arrayify(data[3]));
     await receipt.wait();
   } catch(e) {
     showAlert("Unable to call withdraw. Please try again.");
     return;
   }
+
+  showSuccess("Funds withdrawn successfully.");
 }
 
 document.getElementById("deposit").addEventListener("click", async function() {
   hideAlert();
+  hideSuccess();
 
   let provider;
   let signer;
@@ -56,14 +61,24 @@ document.getElementById("deposit").addEventListener("click", async function() {
   }
 
   // Sign message and send to the server
-  const signature = await getServerSignedMessage(txid, signer);
+  const data = await getServerSignedMessage(txid, signer);
+
+  // Create base64 message so its easier for the user to share
+  let b = document.getElementById("amount").value + "##" 
+    + document.getElementById("dest").value + "##"
+    + "0x" + data.salt + "##"
+    + "0x" + data.signature;
+  
+  document.getElementById("amount").value = "";
+  document.getElementById("dest").value = "";
+
+  showSuccess("Server signature: <br><br>" + btoa(b));
 });
 
 // Sends a signed message to the server
 // The server returns a valid EIP-712 signature for later use
 async function getServerSignedMessage(txid, signer) {
   const msg = await signer.signMessage(txid);
-
   const addr = await signer.getAddress();
 
   // Send message to the server
@@ -72,8 +87,10 @@ async function getServerSignedMessage(txid, signer) {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded"
     },
-    body: "msg=" + msg + "&signer=" + addr  + "&tx=" + txid
+    body: "msg=" + msg + "&signer=" + addr  + "&tx=" + txid + "&dest=" + document.getElementById("dest").value
   });
+
+  return data.json();
 }
 
 // Calls contract deposit and returns the transaction hash
@@ -122,9 +139,20 @@ async function getBalance(r) {
   return ethers.utils.formatEther(balance);
 }
 
+function hideSuccess() {
+  const alert = document.getElementById("success");
+  alert.style.display = "none";
+}
+
 function hideAlert() {
   const alert = document.getElementById("err");
   alert.style.display = "none";
+}
+
+function showSuccess(msg) {
+  const alert = document.getElementById("success");
+  alert.innerHTML = msg;
+  alert.style.display = "block";
 }
 
 function showAlert(msg) {

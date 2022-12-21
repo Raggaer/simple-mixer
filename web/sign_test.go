@@ -17,7 +17,7 @@ func TestSignGenerate(t *testing.T) {
 		return
 	}
 
-	signature, salt, err := signWithdraw(to, contract, salt, priv)
+	signature, salt, err := signWithdraw(to, contract, "5000000000000000000", salt, priv)
 	if err != nil {
 		t.Fatalf("Unable to signWithdraw: %v", err)
 		return

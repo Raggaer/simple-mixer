@@ -1,6 +1,6 @@
 # SimpleMixer
 
-![Preview](preview.png)
+![Preview](preview.jpg)
 
 SimpleMixer is a simple centralized Ethereum mixer that uses ECDSA signatures for withdrawing funds.
 Users are able to deposit funds into the contract but they need a signature from the central server in order to retrieve the funds back.
@@ -10,6 +10,14 @@ The user can now use that signature from a different public address to interact 
 This method will check if the signature was signed by the central address and send the funds (minus a configurable fee).
 
 ## Deployment
+
+First step is to have a local node running, usually `ganache` is a good fit.
+
+After the node is running, next step is to deploy the smart contract with the deployment script:
+
+```shell
+npx hardhat run --network localhost scripts/deploy-mixer.js
+```
 
 
 

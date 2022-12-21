@@ -30,7 +30,7 @@ func main() {
 	}
 
 	// Load private key
-	privKey, err := parsePrivateKey("")
+	privKey, err := parsePrivateKey("0x1b446b8dbd281b048b7fbee03505c21eff5d4ea6ae0ffbf5cf8a28b3fa3e1814")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to parse private key: %v\n", err)
 		return

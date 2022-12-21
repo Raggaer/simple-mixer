@@ -15,7 +15,7 @@ func showHomepage(ctx *controllerContext) error {
 	ctx.tpl.ExecuteTemplate(ctx.res, "homepage.html", showHomepageData{
 		Rpc:  "http://localhost:8545",
 		Abi:  ctx.abi,
-		Addr: "0x087F95CccF11F7761Bbd66097e72f730F618Ada2",
+		Addr: "0x213C4dFfFD764765d11FbC067b9Ef89853CCb4a3",
 	})
 	return nil
 }
