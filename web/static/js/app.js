@@ -22,16 +22,21 @@ document.getElementById("withdraw").addEventListener("click", async function() {
 async function withdrawFunds(signer) {
   const addr = await signer.getAddress();
   const signature = document.getElementById("signature").value;
-  const data = atob(signature).split("##");
+  const data = JSON.parse(atob(signature));
+
+  console.log(data.dest)
+  console.log(data.amount)
+  console.log(data.salt)
+  console.log(data.signature)
 
   // Call withdraw method
   try {
     const contract_WO = new ethers.Contract(mixerContractAddress, mixerContractABI, signer);
     const receipt = await contract_WO.withdraw({
-      amount: ethers.utils.parseEther(data[0]),
-      salt: ethers.utils.arrayify(data[2]),
-      to: data[1],
-    }, ethers.utils.arrayify(data[3]));
+      amount: ethers.utils.parseEther(data.amount),
+      salt: ethers.utils.arrayify(data.salt),
+      to: data.dest,
+    }, ethers.utils.arrayify(data.signature));
     await receipt.wait();
   } catch(e) {
     showAlert("Unable to call withdraw. Please try again.");
@@ -64,15 +69,17 @@ document.getElementById("deposit").addEventListener("click", async function() {
   const data = await getServerSignedMessage(txid, signer);
 
   // Create base64 message so its easier for the user to share
-  let b = document.getElementById("amount").value + "##" 
-    + document.getElementById("dest").value + "##"
-    + "0x" + data.salt + "##"
-    + "0x" + data.signature;
+  let b = {
+    amount: document.getElementById("amount").value,
+    dest: document.getElementById("dest").value, 
+    salt: "0x" + data.salt,
+    signature: "0x" + data.signature
+  }
   
   document.getElementById("amount").value = "";
   document.getElementById("dest").value = "";
 
-  showSuccess("Server signature: <br><br>" + btoa(b));
+  showSuccess("Server signature: <br><br>" + btoa(JSON.stringify(b)));
 });
 
 // Sends a signed message to the server

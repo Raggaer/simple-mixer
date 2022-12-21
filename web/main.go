@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"html/template"
@@ -8,6 +9,10 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+)
+
+var (
+	contractAddress = "0x0"
 )
 
 type httpHandlerFunc func(*controllerContext) error
@@ -21,7 +26,15 @@ type controllerContext struct {
 	client *ethclient.Client
 }
 
+type applicationFlags struct {
+	privateKey      string
+	contractAddress string
+}
+
 func main() {
+	flags := parseApplicationFlags()
+	contractAddress = flags.contractAddress
+
 	// Load templates
 	tpl, err := template.New("SimpleMixer").ParseGlob("views/*")
 	if err != nil {
@@ -30,7 +43,7 @@ func main() {
 	}
 
 	// Load private key
-	privKey, err := parsePrivateKey("0x1b446b8dbd281b048b7fbee03505c21eff5d4ea6ae0ffbf5cf8a28b3fa3e1814")
+	privKey, err := parsePrivateKey(flags.privateKey)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to parse private key: %v\n", err)
 		return
@@ -71,6 +84,14 @@ func main() {
 	if err := httpServer.ListenAndServe(); err != nil {
 		fmt.Printf("Unable to start HTTP server: %v\r\n", err)
 	}
+}
+
+func parseApplicationFlags() *applicationFlags {
+	f := applicationFlags{}
+	flag.StringVar(&f.privateKey, "privateKey", "0x0", "Private key for message signing")
+	flag.StringVar(&f.contractAddress, "contractAddress", "0x0", "Address where the mixer contract is deployed")
+	flag.Parse()
+	return &f
 }
 
 func staticHandler(fs http.Handler) http.HandlerFunc {

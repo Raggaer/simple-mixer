@@ -49,7 +49,7 @@ func sendSignature(ctx *controllerContext) error {
 	}
 
 	// Generate EIP-712 signature for the client
-	signature, salt, err := signWithdraw(dest, "0x213C4dFfFD764765d11FbC067b9Ef89853CCb4a3", amount, nil, ctx.priv)
+	signature, salt, err := signWithdraw(dest, contractAddress, amount, nil, ctx.priv)
 	if err != nil {
 		return fmt.Errorf("Unable to signWithdraw: %v", err)
 	}

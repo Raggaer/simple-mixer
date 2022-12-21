@@ -5,7 +5,7 @@ and to run a simple front-end so users can interact with the contract directly.
 
 ## Deployment
 
-Just compilation of the Go application is needed using `go build`.
+Just the compilation of the Go application is needed using `go build`.
 By default the HTTP server will listen on `:8080`.
 
 First run:
@@ -16,6 +16,11 @@ go build
 
 Then execute the compiled binary that is produced.
 Visit `localhost:8080` to view the front-end.
+
+The following flags should be provided when starting the application:
+
+- privateKey: Hexadecimal string representation of the private key to use for ECDSA signatures.
+- contractAddress: Address where the contract is currently deployed.
 
 ## Testing
 
