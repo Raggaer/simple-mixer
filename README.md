@@ -19,6 +19,14 @@ After the node is running, next step is to deploy the smart contract with the de
 npx hardhat run --network localhost scripts/deploy-mixer.js
 ```
 
+And finally, its time to run the web server:
+
+```shell
+./simple_mixer -privateKey "0x56....." -contractAddress "0x42....."
+```
+
+The web server application expects you to pass some flags (privateKey used for signing and contractAddress).
+Its important that the privateKey attribute matches the private key of the contract deployer.
 
 
 ## Repository structure
