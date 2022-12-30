@@ -2,7 +2,7 @@
 
 ![Preview](preview.jpg)
 
-SimpleMixer is a simple centralized Ethereum mixer that uses ECDSA signatures for withdrawing funds.
+SimpleMixer is a simple centralized Ethereum mixer that uses EIP-712 signatures for withdrawing funds.
 Users are able to deposit funds into the contract but they need a signature from the central server in order to retrieve the funds back.
 
 The central server will emit a new EIP712 signed message. 

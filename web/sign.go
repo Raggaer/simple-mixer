@@ -8,7 +8,15 @@ import (
 	"math/big"
 )
 
-// Generate a valid EIP712 signed message
+// Generates a valid EIP-712 signed message
+// @param to Hexadecimal address where funds will be sent eventually
+// @param contract Hexadecimal address where contract is deployed
+// @param amount BigInt string representation of the amount to transfer
+// @param salt Byte array representation of the salt used for the EIP-712 signature
+// @param priv Private key struct
+// @out signature Byte array representation of an ECDSA signature
+// @out salt Byte array representation of the salt used for the signature
+// @out error
 func signWithdraw(to, contract, amount string, salt []byte, priv *privateKey) ([]byte, []byte, error) {
 	typedData, salt, err := hashTypedData(salt, amount, to, contract)
 	if err != nil {
@@ -27,6 +35,7 @@ func signWithdraw(to, contract, amount string, salt []byte, priv *privateKey) ([
 	return signature, salt, err
 }
 
+// Generates a hash typed data struct used for EIP-712 signatures
 func hashTypedData(salt []byte, amount, to, contract string) ([]byte, []byte, error) {
 	// Generate salt
 	if salt == nil {

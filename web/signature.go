@@ -22,6 +22,7 @@ type sendSignatureResponse struct {
 	Amount    string `json:"amount"`
 }
 
+// Retrieves a user generated signature and returns a valid ECDSA signature
 func sendSignature(ctx *controllerContext) error {
 	msg := ctx.req.FormValue("msg")
 	dest := ctx.req.FormValue("dest")
@@ -70,6 +71,7 @@ func sendSignature(ctx *controllerContext) error {
 	return nil
 }
 
+// Checks if the given transaction was signed by the expected public key
 func checkTransaction(client *ethclient.Client, expectedSigner, txHash string) (bool, string, error) {
 	tx, pending, err := client.TransactionByHash(context.Background(), common.HexToHash(txHash))
 	if err != nil {
@@ -90,6 +92,7 @@ func checkTransaction(client *ethclient.Client, expectedSigner, txHash string) (
 	return true, tx.Value().String(), nil
 }
 
+// Verifies if the given user signed message is valid
 func verifySignature(signedMessage, message string) (string, error) {
 	// Create hash of the message
 	hashedMessage := []byte("\x19Ethereum Signed Message:\n" + strconv.Itoa(len(message)) + message)

@@ -86,6 +86,7 @@ func main() {
 	}
 }
 
+// Parses the given application flags
 func parseApplicationFlags() *applicationFlags {
 	f := applicationFlags{}
 	flag.StringVar(&f.privateKey, "privateKey", "0x0", "Private key for message signing")
@@ -94,6 +95,7 @@ func parseApplicationFlags() *applicationFlags {
 	return &f
 }
 
+// Serves static images
 func staticHandler(fs http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		fs.ServeHTTP(w, req)

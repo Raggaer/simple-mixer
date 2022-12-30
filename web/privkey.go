@@ -15,6 +15,8 @@ type privateKey struct {
 	From    common.Address
 }
 
+// Parses the given private key in hexadecimal
+// Retrieves the public key and a valid private key object
 func parsePrivateKey(priv string) (*privateKey, error) {
 	privKey, err := crypto.HexToECDSA(strings.TrimPrefix(priv, "0x"))
 	if err != nil {
