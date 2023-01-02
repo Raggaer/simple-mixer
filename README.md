@@ -26,7 +26,7 @@ And finally, its time to run the web server:
 ```
 
 The web server application expects you to pass some flags (privateKey used for signing and contractAddress).
-Its important that the privateKey attribute matches the private key of the contract deployer.
+Its important that the privateKey attribute matches the private key of the contract deployer (used on the contract constructor).
 
 
 ## Repository structure
@@ -51,3 +51,6 @@ the main server is able to view the relation between deposit and withdraw calls.
 
 Due to front-running issues the user A must provide a destination address to the server.
 If not, users could check the Mempool and get the signature, using it with a different `to` address.
+
+If the central server dissapears any user without an already generated signature wont be able to retrieve the funds back. 
+Unless the private key was shared, so users could generate the needed signatures.
