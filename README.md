@@ -28,6 +28,7 @@ And finally, its time to run the web server:
 The web server application expects you to pass some flags (privateKey used for signing and contractAddress).
 Its important that the privateKey attribute matches the private key of the contract deployer (used on the contract constructor).
 
+**The private key is passed raw as an argument for the PoC. Outside of the PoC it makes sense to use a more secure approach like an external signer**
 
 ## Repository structure
 

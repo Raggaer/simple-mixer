@@ -22,6 +22,8 @@ The following flags should be provided when starting the application:
 - privateKey: Hexadecimal string representation of the private key to use for ECDSA signatures.
 - contractAddress: Address where the contract is currently deployed.
 
+**The private key is passed raw as an argument for the PoC. Outside of the PoC it makes sense to use a more secure approach like an external signer**
+
 ## Testing
 
 The following command will execute all the repository tests:
