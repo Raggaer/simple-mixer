@@ -19,12 +19,12 @@ contract SimpleMixer {
   }
 
   // Calculate the WithdrawAction struct hash
-  bytes32 private WITHDRAW_ACTION_IDENTIFIER = keccak256(
+  bytes32 private immutable WITHDRAW_ACTION_IDENTIFIER = keccak256(
     abi.encodePacked("WithdrawAction(uint256 amount,bytes32 salt,address to)")
   );
 
   // Calculate the EIP712 domain struct hash
-  bytes32 private DOMAIN_IDENTIFIER = keccak256(
+  bytes32 private immutable DOMAIN_IDENTIFIER = keccak256(
     abi.encodePacked(
       keccak256(bytes("EIP712Domain(string name,address verifyingContract)")),
       keccak256(bytes("SimpleMixer")),
