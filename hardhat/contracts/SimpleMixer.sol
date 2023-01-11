@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: MIT 
-pragma solidity ^0.8.0;
-
-import "hardhat/console.sol";
+pragma solidity ^0.8.16;
 
 /// @title A simple mixer using ECDSA signatures
 /// @author Álvaro Carvajal Castro
@@ -37,6 +35,7 @@ contract SimpleMixer {
   /// @param _rate Fee rate to apply to all withdraw operations
   constructor(address _r, uint256 _rate) {
     require(_rate > 0 && _rate < 10000, "Invalid fee rate");
+    require(_r != address(0), "Invalid fee address");
 
     authPublicKey = msg.sender;
     feeRecipient = _r;
