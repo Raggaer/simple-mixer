@@ -13,13 +13,39 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"strconv"
 	"strings"
+	"sync"
 )
+
+var (
+	verifiedTransactions = &verifiedTransactionsData{
+		txs: map[string]bool{},
+		rw:  &sync.RWMutex{},
+	}
+)
+
+type verifiedTransactionsData struct {
+	txs map[string]bool
+	rw  *sync.RWMutex
+}
 
 type sendSignatureResponse struct {
 	Success   bool   `json:"success"`
 	Signature string `json:"signature"`
 	Salt      string `json:"salt"`
 	Amount    string `json:"amount"`
+}
+
+func (v *verifiedTransactionsData) check(tx string) bool {
+	v.rw.RLock()
+	_, ok := v.txs[tx]
+	v.rw.RUnlock()
+	return ok
+}
+
+func (v *verifiedTransactionsData) mark(tx string) {
+	v.rw.Lock()
+	v.txs[tx] = true
+	v.rw.Unlock()
 }
 
 // Retrieves a user generated signature and returns a valid ECDSA signature
@@ -55,6 +81,8 @@ func sendSignature(ctx *controllerContext) error {
 		return fmt.Errorf("Unable to signWithdraw: %v", err)
 	}
 
+	// Mark transaction as already used
+
 	// Return data as json
 	response, err := json.Marshal(sendSignatureResponse{
 		Success:   true,
@@ -73,6 +101,11 @@ func sendSignature(ctx *controllerContext) error {
 
 // Checks if the given transaction was signed by the expected public key
 func checkTransaction(client *ethclient.Client, expectedSigner, txHash string) (bool, string, error) {
+	// Check if transaction was already used
+	if verifiedTransactions.check(txHash) {
+		return false, "", nil
+	}
+
 	tx, pending, err := client.TransactionByHash(context.Background(), common.HexToHash(txHash))
 	if err != nil {
 		return false, "", err
