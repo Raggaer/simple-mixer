@@ -82,6 +82,7 @@ func sendSignature(ctx *controllerContext) error {
 	}
 
 	// Mark transaction as already used
+	verifiedTransactions.mark(tx)
 
 	// Return data as json
 	response, err := json.Marshal(sendSignatureResponse{
@@ -120,6 +121,14 @@ func checkTransaction(client *ethclient.Client, expectedSigner, txHash string) (
 		return false, "", fmt.Errorf("Unable to retrieve transaction latest signer: %v", err)
 	}
 	if strings.ToLower(signer.Hex()) != strings.ToLower(expectedSigner) {
+		return false, "", nil
+	}
+
+	// Function selector must be "deposit()"
+	if tx.To().Hex() != contractAddress {
+		return false, "", nil
+	}
+	if hex.EncodeToString(tx.Data()) == "d0e30db0" {
 		return false, "", nil
 	}
 	return true, tx.Value().String(), nil
