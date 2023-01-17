@@ -128,7 +128,7 @@ func checkTransaction(client *ethclient.Client, expectedSigner, txHash string) (
 	if tx.To().Hex() != contractAddress {
 		return false, "", nil
 	}
-	if hex.EncodeToString(tx.Data()) == "d0e30db0" {
+	if hex.EncodeToString(tx.Data()) != "d0e30db0" {
 		return false, "", nil
 	}
 	return true, tx.Value().String(), nil
